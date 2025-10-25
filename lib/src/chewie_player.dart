@@ -24,10 +24,16 @@ class ChewieAudio extends StatefulWidget {
   const ChewieAudio({
     Key? key,
     required this.controller,
+    this.hideSubtitle = false,
+    this.onToggleSubtitle,
+    this.currentSubtitle,
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieAudioController controller;
+  final bool hideSubtitle;
+  final Function(Subtitle)? currentSubtitle;
+  final Function(bool)? onToggleSubtitle;
 
   @override
   ChewieAudioState createState() {
@@ -45,7 +51,29 @@ class ChewieAudioState extends State<ChewieAudio> {
   Widget build(BuildContext context) {
     return ChewieAudioControllerProvider(
       controller: widget.controller,
-      child: const PlayerWithControls(),
+      child: PlayerWithControls(
+          currentSubtitle: widget.currentSubtitle,
+          onToggleSubtitle: widget.onToggleSubtitle,
+          hideSubtitle: widget.hideSubtitle,
+          borderRadius: widget.controller.borderRadius,
+          iconColor: widget.controller.iconColor,
+          progressBarHeight: widget.controller.progressBarHeight,
+          barBackGroundColorSpeedDialog:
+              widget.controller.barBackGroundColorSpeedDialog,
+          dividerColorSpeedDialog: widget.controller.dividerColorSpeedDialog,
+          textColorSpeedDialog: widget.controller.textColorSpeedDialog,
+          barBackGroundColor: widget.controller.barBackGroundColor,
+          ccIconSize: widget.controller.ccIconSize,
+          muteIconSize: widget.controller.muteIconSize,
+          pauseIconSize: widget.controller.pauseIconSize,
+          playIconSize: widget.controller.playIconSize,
+          seekTimeFontSize: widget.controller.seekTimeFontSize,
+          skipBackwardSize: widget.controller.skipBackwardSize,
+          skipForwardSize: widget.controller.skipForwardSize,
+          indicatorSpeedDialog: widget.controller.indicatorSpeedDialog,
+          speedIconSize: widget.controller.speedIconSize,
+          volumeIconSize: widget.controller.volumeIconSize,
+          barHeight: widget.controller.barHeight),
     );
   }
 }
@@ -58,35 +86,53 @@ class ChewieAudioState extends State<ChewieAudio> {
 /// player, please use the standard information provided by the
 /// `VideoPlayerController`.
 class ChewieAudioController extends ChangeNotifier {
-  ChewieAudioController({
-    required this.videoPlayerController,
-    this.optionsTranslation,
-    this.autoInitialize = false,
-    this.autoPlay = false,
-    this.draggableProgressBar = true,
-    this.startAt,
-    this.looping = false,
-    this.cupertinoProgressColors,
-    this.materialProgressColors,
-    this.showControlsOnInitialize = true,
-    this.showOptions = true,
-    this.optionsBuilder,
-    this.additionalOptions,
-    this.showControls = true,
-    this.transformationController,
-    this.zoomAndPan = false,
-    this.maxScale = 2.5,
-    this.subtitle,
-    this.subtitleBuilder,
-    this.customControls,
-    this.errorBuilder,
-    this.isLive = false,
-    this.allowMuting = true,
-    this.allowPlaybackSpeedChanging = true,
-    this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
-    this.progressIndicatorDelay,
-    this.controlsSafeAreaMinimum = EdgeInsets.zero,
-  }) : assert(
+  ChewieAudioController(
+      {required this.videoPlayerController,
+      this.optionsTranslation,
+      this.autoInitialize = false,
+      this.autoPlay = false,
+      this.draggableProgressBar = true,
+      this.startAt,
+      this.looping = false,
+      this.cupertinoProgressColors,
+      this.materialProgressColors,
+      this.showControlsOnInitialize = true,
+      this.showOptions = true,
+      this.optionsBuilder,
+      this.additionalOptions,
+      this.showControls = true,
+      this.borderRadius,
+      this.transformationController,
+      this.zoomAndPan = false,
+      this.maxScale = 2.5,
+      this.subtitle,
+      this.subtitleBuilder,
+      this.customControls,
+      this.errorBuilder,
+      this.isLive = false,
+      this.iconColor,
+      this.barBackGroundColor,
+      this.barHeight,
+      this.progressBarHeight,
+      this.allowMuting = true,
+      this.barBackGroundColorSpeedDialog,
+      this.dividerColorSpeedDialog,
+      this.textColorSpeedDialog,
+      this.allowPlaybackSpeedChanging = true,
+      this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+      this.progressIndicatorDelay,
+      this.controlsSafeAreaMinimum = EdgeInsets.zero,
+      this.ccIconSize,
+      this.muteIconSize,
+      this.pauseIconSize,
+      this.playIconSize,
+      this.seekTimeFontSize,
+      this.skipBackwardSize,
+      this.skipForwardSize,
+      this.speedIconSize,
+      this.indicatorSpeedDialog,
+      this.volumeIconSize})
+      : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
         ) {
@@ -138,38 +184,75 @@ class ChewieAudioController extends ChangeNotifier {
       Animation<double>,
       ChewieAudioControllerProvider,
     )? routePageBuilder,
+    Color? barBackGroundColor,
+    double? barHeight,
+    Color? iconColor,
+    Color? barBackGroundColorSpeedDialog,
+    Color? textColorSpeedDialog,
+    Color? dividerColorSpeedDialog,
+    Color? indicatorSpeedDialog,
+    BorderRadiusGeometry? borderRadius,
+    double? playIconSize,
+    double? pauseIconSize,
+    double? skipForwardSize,
+    double? skipBackwardSize,
+    double? volumeIconSize,
+    double? muteIconSize,
+    double? ccIconSize,
+    double? speedIconSize,
+    double? seekTimeFontSize,
+    double? progressBarHeight,
   }) {
     return ChewieAudioController(
-      draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
-      videoPlayerController:
-          videoPlayerController ?? this.videoPlayerController,
-      optionsTranslation: optionsTranslation ?? this.optionsTranslation,
-      autoInitialize: autoInitialize ?? this.autoInitialize,
-      autoPlay: autoPlay ?? this.autoPlay,
-      startAt: startAt ?? this.startAt,
-      looping: looping ?? this.looping,
-      cupertinoProgressColors:
-          cupertinoProgressColors ?? this.cupertinoProgressColors,
-      materialProgressColors:
-          materialProgressColors ?? this.materialProgressColors,
-      showControlsOnInitialize:
-          showControlsOnInitialize ?? this.showControlsOnInitialize,
-      showOptions: showOptions ?? this.showOptions,
-      optionsBuilder: optionsBuilder ?? this.optionsBuilder,
-      additionalOptions: additionalOptions ?? this.additionalOptions,
-      showControls: showControls ?? this.showControls,
-      subtitle: subtitle ?? this.subtitle,
-      subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
-      customControls: customControls ?? this.customControls,
-      errorBuilder: errorBuilder ?? this.errorBuilder,
-      isLive: isLive ?? this.isLive,
-      allowMuting: allowMuting ?? this.allowMuting,
-      allowPlaybackSpeedChanging:
-          allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
-      playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
-      progressIndicatorDelay:
-          progressIndicatorDelay ?? this.progressIndicatorDelay,
-    );
+        draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
+        videoPlayerController:
+            videoPlayerController ?? this.videoPlayerController,
+        optionsTranslation: optionsTranslation ?? this.optionsTranslation,
+        autoInitialize: autoInitialize ?? this.autoInitialize,
+        autoPlay: autoPlay ?? this.autoPlay,
+        startAt: startAt ?? this.startAt,
+        looping: looping ?? this.looping,
+        cupertinoProgressColors:
+            cupertinoProgressColors ?? this.cupertinoProgressColors,
+        materialProgressColors:
+            materialProgressColors ?? this.materialProgressColors,
+        showControlsOnInitialize:
+            showControlsOnInitialize ?? this.showControlsOnInitialize,
+        showOptions: showOptions ?? this.showOptions,
+        optionsBuilder: optionsBuilder ?? this.optionsBuilder,
+        additionalOptions: additionalOptions ?? this.additionalOptions,
+        showControls: showControls ?? this.showControls,
+        subtitle: subtitle ?? this.subtitle,
+        subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
+        customControls: customControls ?? this.customControls,
+        errorBuilder: errorBuilder ?? this.errorBuilder,
+        isLive: isLive ?? this.isLive,
+        allowMuting: allowMuting ?? this.allowMuting,
+        allowPlaybackSpeedChanging:
+            allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
+        playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
+        progressIndicatorDelay:
+            progressIndicatorDelay ?? this.progressIndicatorDelay,
+        barBackGroundColor: barBackGroundColor ?? this.barBackGroundColor,
+        barHeight: barHeight ?? this.barHeight,
+        borderRadius: borderRadius ?? this.borderRadius,
+        barBackGroundColorSpeedDialog:
+            barBackGroundColorSpeedDialog ?? this.barBackGroundColorSpeedDialog,
+        textColorSpeedDialog: textColorSpeedDialog ?? this.textColorSpeedDialog,
+        dividerColorSpeedDialog:
+            dividerColorSpeedDialog ?? this.dividerColorSpeedDialog,
+        iconColor: iconColor ?? this.iconColor,
+        playIconSize: playIconSize ?? this.playIconSize,
+        pauseIconSize: pauseIconSize ?? this.pauseIconSize,
+        skipForwardSize: skipForwardSize ?? this.skipForwardSize,
+        skipBackwardSize: skipBackwardSize ?? this.skipBackwardSize,
+        volumeIconSize: volumeIconSize ?? this.volumeIconSize,
+        muteIconSize: muteIconSize ?? this.muteIconSize,
+        ccIconSize: ccIconSize ?? this.ccIconSize,
+        progressBarHeight: progressBarHeight ?? this.progressBarHeight,
+        speedIconSize: speedIconSize ?? this.speedIconSize,
+        indicatorSpeedDialog: indicatorSpeedDialog ?? this.indicatorSpeedDialog,
+        seekTimeFontSize: seekTimeFontSize ?? this.seekTimeFontSize);
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
@@ -206,11 +289,26 @@ class ChewieAudioController extends ChangeNotifier {
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
 
+  final BorderRadiusGeometry? borderRadius;
+
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
 
   /// Initialize the Audio on Startup. This will prep the audio for playback.
   final bool autoInitialize;
+
+  final Color? iconColor;
+  final double? playIconSize;
+  final double? pauseIconSize;
+  final double? skipForwardSize;
+  final double? skipBackwardSize;
+  final double? volumeIconSize;
+  final double? muteIconSize;
+  final double? ccIconSize;
+  final double? speedIconSize;
+  final double? seekTimeFontSize;
+  final Color? indicatorSpeedDialog;
+  final double? progressBarHeight;
 
   /// Play the audio as soon as it's initialized
   final bool autoPlay;
@@ -274,6 +372,13 @@ class ChewieAudioController extends ChangeNotifier {
   /// Adds additional padding to the controls' [SafeArea] as desired.
   /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
+
+  final Color? barBackGroundColor;
+  final Color? barBackGroundColorSpeedDialog;
+  final Color? textColorSpeedDialog;
+  final Color? dividerColorSpeedDialog;
+
+  final double? barHeight;
 
   static ChewieAudioController of(BuildContext context) {
     final chewieControllerProvider = context

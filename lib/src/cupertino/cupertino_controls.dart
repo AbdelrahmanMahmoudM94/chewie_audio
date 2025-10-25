@@ -12,20 +12,62 @@ import 'package:chewie_audio/src/models/option_item.dart';
 import 'package:chewie_audio/src/models/subtitle_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:video_player/video_player.dart';
 
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
     required this.backgroundColor,
     required this.iconColor,
+    this.barBackGroundColor,
+    this.barHeight,
     this.showPlayButton = true,
+    this.onToggleSubtitle,
+    this.barBackGroundColorSpeedDialog,
+    this.textColorSpeedDialog,
+    this.dividerColorSpeedDialog,
+    this.hideSubtitle = false,
+    this.borderRadius,
+    this.ccIconSize,
+    this.muteIconSize,
+    this.pauseIconSize,
+    this.playIconSize,
+    this.seekTimeFontSize,
+    this.skipBackwardSize,
+    this.skipForwardSize,
+    this.speedIconSize,
+    this.indicatorSpeedDialog,
+    this.volumeIconSize,
+    this.currentSubtitle,
+    this.progressBarHeight,
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final Color? barBackGroundColor;
+  final double? barHeight;
+  final bool hideSubtitle;
+  final Function(Subtitle)? currentSubtitle;
+  final Function(bool)? onToggleSubtitle;
+  final Color? barBackGroundColorSpeedDialog;
+  final Color? textColorSpeedDialog;
+  final Color? dividerColorSpeedDialog;
+  final double? playIconSize;
+  final double? pauseIconSize;
+  final double? skipForwardSize;
+  final double? skipBackwardSize;
+  final double? volumeIconSize;
+  final double? muteIconSize;
+  final double? ccIconSize;
+  final double? speedIconSize;
+  final double? seekTimeFontSize;
+  final Color? indicatorSpeedDialog;
 
+  final double? progressBarHeight;
+  final BorderRadiusGeometry? borderRadius;
   @override
   State<StatefulWidget> createState() {
     return _CupertinoControlsState();
@@ -75,7 +117,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     final orientation = MediaQuery.of(context).orientation;
-    final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
+    final barHeight =
+        widget.barHeight ?? (orientation == Orientation.portrait ? 30.0 : 47.0);
 
     return Stack(
       children: [
@@ -84,8 +127,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
             child: CircularProgressIndicator(),
           ),
         Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             if (_subtitleOn) _buildSubtitles(chewieController.subtitle!),
             _buildBottomBar(backgroundColor, iconColor, barHeight),
@@ -175,28 +216,15 @@ class _CupertinoControlsState extends State<CupertinoControls>
     }
 
     if (chewieController.subtitleBuilder != null) {
-      return chewieController.subtitleBuilder!(
-        context,
-        currentSubtitle.first!.text,
-      );
+      widget.currentSubtitle?.call(currentSubtitle.first!);
+      return const SizedBox.shrink();
     }
 
-    return Padding(
-      padding: EdgeInsets.only(left: marginSize, right: marginSize),
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: const Color(0x96000000),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Text(
-          currentSubtitle.first!.text.toString(),
-          style: const TextStyle(
-            fontSize: 18,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
+    //
+    return Icon(
+      Icons.closed_caption,
+      color: widget.iconColor,
+      size: 90,
     );
   }
 
@@ -205,65 +233,51 @@ class _CupertinoControlsState extends State<CupertinoControls>
     Color iconColor,
     double barHeight,
   ) {
-    return SafeArea(
-      minimum: chewieController.controlsSafeAreaMinimum,
-      child: Container(
-        color: Colors.transparent,
-        alignment: Alignment.bottomCenter,
-        margin: EdgeInsets.all(marginSize),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(
-              sigmaX: 10.0,
-              sigmaY: 10.0,
-            ),
-            child: Container(
-              height: barHeight,
-              color: backgroundColor,
-              child: chewieController.isLive
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _buildPlayPause(controller, iconColor, barHeight),
-                        _buildLive(iconColor),
-                        if (chewieController.allowMuting)
-                          _buildMuteButton(
-                            controller,
-                            backgroundColor,
-                            iconColor,
-                            barHeight,
-                          ),
-                      ],
-                    )
-                  : Row(
-                      children: <Widget>[
-                        _buildSkipBack(iconColor, barHeight),
-                        _buildPlayPause(controller, iconColor, barHeight),
-                        _buildSkipForward(iconColor, barHeight),
-                        _buildPosition(iconColor),
-                        _buildProgressBar(),
-                        _buildRemaining(iconColor),
-                        _buildSubtitleToggle(iconColor, barHeight),
-                        if (chewieController.allowMuting)
-                          _buildMuteButton(
-                            controller,
-                            backgroundColor,
-                            iconColor,
-                            barHeight,
-                          ),
-                        if (chewieController.allowPlaybackSpeedChanging)
-                          _buildSpeedButton(controller, iconColor, barHeight),
-                        if (chewieController.additionalOptions != null &&
-                            chewieController
-                                .additionalOptions!(context).isNotEmpty)
-                          _buildOptionsButton(iconColor, barHeight),
-                      ],
-                    ),
-            ),
-          ),
-        ),
+    return Container(
+      height: barHeight,
+      decoration: BoxDecoration(
+        color: widget.barBackGroundColor ?? backgroundColor,
+        borderRadius: widget.borderRadius ?? BorderRadius.circular(10.0),
       ),
+      child: chewieController.isLive
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _buildPlayPause(controller, iconColor, barHeight),
+                _buildLive(iconColor),
+                if (chewieController.allowMuting)
+                  _buildMuteButton(
+                    controller,
+                    backgroundColor,
+                    iconColor,
+                    barHeight,
+                  ),
+              ],
+            )
+          : Row(
+              children: <Widget>[
+                _buildSkipBack(iconColor, barHeight),
+                _buildPlayPause(controller, iconColor, barHeight),
+                _buildSkipForward(iconColor, barHeight),
+                _buildPosition(iconColor),
+                _buildProgressBar(),
+                _buildRemaining(iconColor),
+                if (!widget.hideSubtitle)
+                  _buildSubtitleToggle(iconColor, barHeight),
+                if (chewieController.allowMuting)
+                  _buildMuteButton(
+                    controller,
+                    backgroundColor,
+                    iconColor,
+                    barHeight,
+                  ),
+                if (chewieController.allowPlaybackSpeedChanging)
+                  _buildSpeedButton(controller, iconColor, barHeight),
+                if (chewieController.additionalOptions != null &&
+                    chewieController.additionalOptions!(context).isNotEmpty)
+                  _buildOptionsButton(iconColor, barHeight),
+              ],
+            ),
     );
   }
 
@@ -304,7 +318,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           child: Icon(
             _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
             color: iconColor,
-            size: 16,
+            size: widget.volumeIconSize ?? 16,
           ),
         ),
       ),
@@ -328,6 +342,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         child: AnimatedPlayPause(
           color: widget.iconColor,
           playing: controller.value.isPlaying,
+          size: widget.playIconSize ?? 16.0,
         ),
       ),
     );
@@ -342,7 +357,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         formatDuration(position),
         style: TextStyle(
           color: iconColor,
-          fontSize: 12.0,
+          fontSize: widget.seekTimeFontSize ?? 12.0,
         ),
       ),
     );
@@ -355,18 +370,24 @@ class _CupertinoControlsState extends State<CupertinoControls>
       padding: const EdgeInsets.only(right: 12.0),
       child: Text(
         '-${formatDuration(position)}',
-        style: TextStyle(color: iconColor, fontSize: 12.0),
+        style: TextStyle(
+            color: iconColor, fontSize: widget.seekTimeFontSize ?? 12.0),
       ),
     );
   }
 
-  Widget _buildSubtitleToggle(Color iconColor, double barHeight) {
+  Widget _buildSubtitleToggle(Color? iconColor, double barHeight) {
     //if don't have subtitle hiden button
     if (chewieController.subtitle?.isEmpty ?? true) {
       return const SizedBox();
     }
     return GestureDetector(
-      onTap: _subtitleToggle,
+      onTap: () {
+        setState(() {
+          _subtitleOn = !_subtitleOn;
+          widget.onToggleSubtitle?.call(_subtitleOn);
+        });
+      },
       child: Container(
         height: barHeight,
         color: Colors.transparent,
@@ -375,20 +396,20 @@ class _CupertinoControlsState extends State<CupertinoControls>
           left: 6.0,
           right: 6.0,
         ),
-        child: Icon(
-          Icons.subtitles,
-          color: _subtitleOn ? iconColor : Colors.grey[700],
-          size: 16.0,
+        child: SvgPicture.asset(
+          "assets/svg/cc.svg",
+          width: widget.ccIconSize ?? 16.0,
+          colorFilter: iconColor == null
+              ? null
+              : ColorFilter.mode(
+                  _subtitleOn ? iconColor : iconColor.withValues(alpha: 0.3),
+                  BlendMode.srcIn),
         ),
       ),
     );
   }
 
-  void _subtitleToggle() {
-    setState(() {
-      _subtitleOn = !_subtitleOn;
-    });
-  }
+  void _subtitleToggle() {}
 
   GestureDetector _buildSkipBack(Color iconColor, double barHeight) {
     return GestureDetector(
@@ -404,7 +425,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         child: Icon(
           CupertinoIcons.gobackward_15,
           color: iconColor,
-          size: 18.0,
+          size: widget.skipBackwardSize ?? 18.0,
         ),
       ),
     );
@@ -426,7 +447,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         child: Icon(
           CupertinoIcons.goforward_15,
           color: iconColor,
-          size: 18.0,
+          size: widget.skipForwardSize ?? 18.0,
         ),
       ),
     );
@@ -439,18 +460,24 @@ class _CupertinoControlsState extends State<CupertinoControls>
   ) {
     return GestureDetector(
       onTap: () async {
-        final chosenSpeed = await showCupertinoModalPopup<double>(
+        showModalBottomSheet(
+          backgroundColor: Colors.transparent,
+          isDismissible: true,
+          enableDrag: true,
           context: context,
-          semanticsDismissible: true,
           builder: (context) => _PlaybackSpeedDialog(
+            indicatorColor: widget.indicatorSpeedDialog,
+            onSpeedChanged: (double chosenSpeed) {
+              controller.setPlaybackSpeed(chosenSpeed);
+            },
+            barBackGroundColorSpeedDialog: widget.barBackGroundColorSpeedDialog,
+            dividerColorSpeedDialog: widget.dividerColorSpeedDialog,
+            iconColor: widget.iconColor,
+            textColorSpeedDialog: widget.textColorSpeedDialog,
             speeds: chewieController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
           ),
         );
-
-        if (chosenSpeed != null) {
-          controller.setPlaybackSpeed(chosenSpeed);
-        }
       },
       child: Container(
         height: barHeight,
@@ -462,23 +489,16 @@ class _CupertinoControlsState extends State<CupertinoControls>
         margin: const EdgeInsets.only(
           right: 8.0,
         ),
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.skewY(0.0)
-            ..rotateX(math.pi)
-            ..rotateZ(math.pi * 0.8),
-          child: Icon(
-            Icons.speed,
-            color: iconColor,
-            size: 18.0,
-          ),
+        child: SvgPicture.asset(
+          "assets/svg/speed.svg",
+          width: widget.speedIconSize ?? 16.0,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
         ),
       ),
     );
   }
 
   Future<void> _initialize() async {
-    _subtitleOn = chewieController.subtitle?.isNotEmpty ?? false;
     controller.addListener(_updateState);
 
     _updateState();
@@ -490,6 +510,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         padding: const EdgeInsets.only(right: 12.0),
         child: CupertinoVideoProgressBar(
           controller,
+          barProgressHeight: widget.progressBarHeight,
           colors: chewieController.cupertinoProgressColors ??
               ChewieProgressColors(
                 playedColor: const Color.fromARGB(
@@ -591,39 +612,115 @@ class _CupertinoControlsState extends State<CupertinoControls>
 }
 
 class _PlaybackSpeedDialog extends StatelessWidget {
-  const _PlaybackSpeedDialog({
-    Key? key,
-    required List<double> speeds,
-    required double selected,
-  })  : _speeds = speeds,
+  const _PlaybackSpeedDialog(
+      {Key? key,
+      required List<double> speeds,
+      required double selected,
+      Color? barBackGroundColorSpeedDialog,
+      Color? textColorSpeedDialog,
+      Color? dividerColorSpeedDialog,
+      Function(double)? onSpeedChanged,
+      Color? indicatorColor,
+      Color? iconColor})
+      : _speeds = speeds,
         _selected = selected,
+        _barBackGroundColorSpeedDialog = barBackGroundColorSpeedDialog,
+        _textColorSpeedDialog = textColorSpeedDialog,
+        _dividerColorSpeedDialog = dividerColorSpeedDialog,
+        _iconColor = iconColor,
+        _onSpeedChanged = onSpeedChanged,
+        _indicatorColor = indicatorColor,
         super(key: key);
 
   final List<double> _speeds;
   final double _selected;
+  final Color? _barBackGroundColorSpeedDialog;
+  final Color? _textColorSpeedDialog;
+  final Color? _dividerColorSpeedDialog;
+  final Color? _iconColor;
+  final Color? _indicatorColor;
+  final Function(double)? _onSpeedChanged;
 
   @override
   Widget build(BuildContext context) {
     final selectedColor = CupertinoTheme.of(context).primaryColor;
 
-    return CupertinoActionSheet(
-      actions: _speeds
-          .map(
-            (e) => CupertinoActionSheetAction(
-              onPressed: () {
-                Navigator.of(context).pop(e);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+        decoration: BoxDecoration(
+            color: _barBackGroundColorSpeedDialog ?? Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r))),
+        height: 0.54.sh,
+        child: Column(
+          children: [
+            buildIndicator(color: _indicatorColor ?? selectedColor),
+            SizedBox(
+              height: 10.h,
+            ),
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: _speeds.length,
+              itemBuilder: (context, index) => Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (e == _selected)
-                    Icon(Icons.check, size: 20.0, color: selectedColor),
-                  Text(e.toString()),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _onSpeedChanged!(_speeds[index]);
+                      Navigator.pop(context);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_speeds[index] == _selected)
+                          Icon(
+                            Icons.check,
+                            size: 20.0,
+                            color: _iconColor ?? selectedColor,
+                          ),
+                        Text(
+                          _speeds[index].toString(),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: _textColorSpeedDialog ??
+                                CupertinoTheme.of(context).primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  if (_speeds[index] != _speeds.last)
+                    Divider(
+                      color: _dividerColorSpeedDialog ?? Colors.grey[300],
+                      height: 1,
+                      thickness: 1,
+                    ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                 ],
               ),
             ),
-          )
-          .toList(),
+          ],
+        ));
+  }
+
+  Container buildIndicator({Color? color}) {
+    return Container(
+      margin: EdgeInsets.only(top: 2.h),
+      width: 70.w,
+      height: 5.h,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(30.w),
+      ),
     );
   }
 }
