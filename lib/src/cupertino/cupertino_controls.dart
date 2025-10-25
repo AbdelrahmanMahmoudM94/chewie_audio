@@ -489,11 +489,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
         margin: const EdgeInsets.only(
           right: 8.0,
         ),
-        child: SvgPicture.asset(
-          "assets/svg/speed.svg",
-          width: widget.speedIconSize ?? 16.0,
-          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-        ),
+        child: Icon(Icons.speed,
+            size: widget.speedIconSize ?? 16.0, color: iconColor),
       ),
     );
   }
