@@ -52,28 +52,30 @@ class ChewieAudioState extends State<ChewieAudio> {
     return ChewieAudioControllerProvider(
       controller: widget.controller,
       child: PlayerWithControls(
-          currentSubtitle: widget.currentSubtitle,
-          onToggleSubtitle: widget.onToggleSubtitle,
-          hideSubtitle: widget.hideSubtitle,
-          borderRadius: widget.controller.borderRadius,
-          iconColor: widget.controller.iconColor,
-          progressBarHeight: widget.controller.progressBarHeight,
-          barBackGroundColorSpeedDialog:
-              widget.controller.barBackGroundColorSpeedDialog,
-          dividerColorSpeedDialog: widget.controller.dividerColorSpeedDialog,
-          textColorSpeedDialog: widget.controller.textColorSpeedDialog,
-          barBackGroundColor: widget.controller.barBackGroundColor,
-          ccIconSize: widget.controller.ccIconSize,
-          muteIconSize: widget.controller.muteIconSize,
-          pauseIconSize: widget.controller.pauseIconSize,
-          playIconSize: widget.controller.playIconSize,
-          seekTimeFontSize: widget.controller.seekTimeFontSize,
-          skipBackwardSize: widget.controller.skipBackwardSize,
-          skipForwardSize: widget.controller.skipForwardSize,
-          indicatorSpeedDialog: widget.controller.indicatorSpeedDialog,
-          speedIconSize: widget.controller.speedIconSize,
-          volumeIconSize: widget.controller.volumeIconSize,
-          barHeight: widget.controller.barHeight),
+        currentSubtitle: widget.currentSubtitle,
+        onToggleSubtitle: widget.onToggleSubtitle,
+        hideSubtitle: widget.hideSubtitle,
+        borderRadius: widget.controller.borderRadius,
+        iconColor: widget.controller.iconColor,
+        progressBarHeight: widget.controller.progressBarHeight,
+        barBackGroundColorSpeedDialog:
+            widget.controller.barBackGroundColorSpeedDialog,
+        dividerColorSpeedDialog: widget.controller.dividerColorSpeedDialog,
+        textColorSpeedDialog: widget.controller.textColorSpeedDialog,
+        barBackGroundColor: widget.controller.barBackGroundColor,
+        ccIconSize: widget.controller.ccIconSize,
+        muteIconSize: widget.controller.muteIconSize,
+        pauseIconSize: widget.controller.pauseIconSize,
+        playIconSize: widget.controller.playIconSize,
+        seekTimeFontSize: widget.controller.seekTimeFontSize,
+        skipBackwardSize: widget.controller.skipBackwardSize,
+        skipForwardSize: widget.controller.skipForwardSize,
+        indicatorSpeedDialog: widget.controller.indicatorSpeedDialog,
+        speedIconSize: widget.controller.speedIconSize,
+        volumeIconSize: widget.controller.volumeIconSize,
+        barHeight: widget.controller.barHeight,
+        speedControlCustomWidget: widget.controller.speedControlCustomWidget,
+      ),
     );
   }
 }
@@ -131,6 +133,7 @@ class ChewieAudioController extends ChangeNotifier {
       this.skipForwardSize,
       this.speedIconSize,
       this.indicatorSpeedDialog,
+      this.speedControlCustomWidget,
       this.volumeIconSize})
       : assert(
           playbackSpeeds.every((speed) => speed > 0),
@@ -202,6 +205,7 @@ class ChewieAudioController extends ChangeNotifier {
     double? speedIconSize,
     double? seekTimeFontSize,
     double? progressBarHeight,
+    Widget? speedControlCustomWidget,
   }) {
     return ChewieAudioController(
         draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -252,7 +256,9 @@ class ChewieAudioController extends ChangeNotifier {
         progressBarHeight: progressBarHeight ?? this.progressBarHeight,
         speedIconSize: speedIconSize ?? this.speedIconSize,
         indicatorSpeedDialog: indicatorSpeedDialog ?? this.indicatorSpeedDialog,
-        seekTimeFontSize: seekTimeFontSize ?? this.seekTimeFontSize);
+        seekTimeFontSize: seekTimeFontSize ?? this.seekTimeFontSize,
+        speedControlCustomWidget:
+            speedControlCustomWidget ?? this.speedControlCustomWidget);
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
@@ -309,6 +315,7 @@ class ChewieAudioController extends ChangeNotifier {
   final double? seekTimeFontSize;
   final Color? indicatorSpeedDialog;
   final double? progressBarHeight;
+  final Widget? speedControlCustomWidget;
 
   /// Play the audio as soon as it's initialized
   final bool autoPlay;

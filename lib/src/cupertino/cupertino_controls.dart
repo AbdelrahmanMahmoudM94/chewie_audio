@@ -41,6 +41,7 @@ class CupertinoControls extends StatefulWidget {
     this.volumeIconSize,
     this.currentSubtitle,
     this.progressBarHeight,
+    this.speedControlCustomWidget,
     Key? key,
   }) : super(key: key);
 
@@ -68,6 +69,7 @@ class CupertinoControls extends StatefulWidget {
 
   final double? progressBarHeight;
   final BorderRadiusGeometry? borderRadius;
+  final Widget? speedControlCustomWidget;
   @override
   State<StatefulWidget> createState() {
     return _CupertinoControlsState();
@@ -489,8 +491,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
         margin: const EdgeInsets.only(
           right: 8.0,
         ),
-        child: Icon(Icons.speed,
-            size: widget.speedIconSize ?? 16.0, color: iconColor),
+        child: widget.speedControlCustomWidget ??
+            Icon(Icons.speed,
+                size: widget.speedIconSize ?? 16.0, color: iconColor),
       ),
     );
   }

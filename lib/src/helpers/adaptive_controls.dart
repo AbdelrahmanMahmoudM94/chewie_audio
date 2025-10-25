@@ -26,6 +26,7 @@ class AdaptiveControls extends StatelessWidget {
     this.indicatorSpeedDialog,
     this.dividerColorSpeedDialog,
     this.progressBarHeight,
+    this.speedControlCustomWidget,
     this.currentSubtitle,
   }) : super(key: key);
   final Color? barBackGroundColor;
@@ -49,6 +50,7 @@ class AdaptiveControls extends StatelessWidget {
   final double? seekTimeFontSize;
   final Color? indicatorSpeedDialog;
     final double? progressBarHeight;
+      final Widget? speedControlCustomWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,7 @@ class AdaptiveControls extends StatelessWidget {
           speedIconSize: speedIconSize,
           volumeIconSize: volumeIconSize,
           indicatorSpeedDialog: indicatorSpeedDialog,
+          speedControlCustomWidget: speedControlCustomWidget,
           currentSubtitle: currentSubtitle,
           backgroundColor: const Color.fromRGBO(41, 41, 41, 0.7),
           iconColor: iconColor ?? const Color.fromARGB(255, 200, 200, 200),

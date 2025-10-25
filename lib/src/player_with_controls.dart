@@ -28,6 +28,7 @@ class PlayerWithControls extends StatelessWidget {
       this.skipForwardSize,
       this.speedIconSize,
       this.indicatorSpeedDialog,
+      this.speedControlCustomWidget,  
       this.volumeIconSize})
       : super(key: key);
   final Color? barBackGroundColor;
@@ -51,7 +52,8 @@ class PlayerWithControls extends StatelessWidget {
   final double? seekTimeFontSize;
   final Color? indicatorSpeedDialog;
   final Function(bool)? onToggleSubtitle;
-    final double? progressBarHeight;
+  final double? progressBarHeight;
+  final Widget? speedControlCustomWidget;
   @override
   Widget build(BuildContext context) {
     final ChewieAudioController chewieController =
@@ -84,6 +86,7 @@ class PlayerWithControls extends StatelessWidget {
                   skipForwardSize: skipForwardSize,
                   speedIconSize: speedIconSize,
                   indicatorSpeedDialog: indicatorSpeedDialog,
+                  speedControlCustomWidget: speedControlCustomWidget,
                   volumeIconSize: volumeIconSize)
           : const SizedBox();
     }
